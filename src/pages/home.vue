@@ -32,7 +32,8 @@
 </template>
 
 <script>
-import { ref, computed } from 'vue'
+import { ref, reactive, computed } from 'vue'
+import http from '@/http-common'
 import Spinner from '@/components/UI/Spinner.vue'
 import Tweet from '@/components/UI/Tweet.vue'
 import TweetForm from '@/components/UI/TweetForm.vue'
@@ -81,7 +82,16 @@ export default {
     }
 
     const handleTweetSubmit = body => {
-      data.value.push({
+      // data.value.push({
+      //   id: data.value.length + 1,
+      //   body,
+      //   avatar:
+      //     'https://tocode.ru/static/_secret/bonuses/1/avatar-1Tq9kaAql.png',
+      //   likes: 0,
+      //   date: new Date(Date.now()).toLocaleString()
+      // })
+
+      const tweet = reactive({
         id: data.value.length + 1,
         body,
         avatar:
@@ -89,6 +99,7 @@ export default {
         likes: 0,
         date: new Date(Date.now()).toLocaleString()
       })
+      http.post('/tweets.json', tweet)
       handleModalShow()
     }
 

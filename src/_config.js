@@ -1,22 +1,23 @@
 export const process = {
-    dev: true,
-};
+  dev: true
+}
 
 export const site = {
-    home: process.dev ? "Dev" : "Prod"
+  home: process.dev ? 'Dev' : 'Prod'
 }
+
 export const app = {
-    title: "VTwitter"
+  title: 'VTwitter'
 }
 export const links = [
-    {
-        title: "Home",
-        alias: "home",
-        url: "/",
-    },
-    {
-        title: "About",
-        alias: "about",
-        url: "/about",
-    },
-];
+  {
+    title: 'Home',
+    alias: 'home',
+    url: '/'
+  },
+  {
+    title: 'About',
+    alias: 'about',
+    url: '/about'
+  }
+]
