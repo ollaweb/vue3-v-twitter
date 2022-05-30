@@ -13,6 +13,7 @@
     </div>
     <div class="tweets" v-for="item in dataSorted" :key="item.id">
       <Tweet
+        @onSubmit="handleLikeSubmit"
         :id="item.id"
         :likes="item.likes"
         :name="item.date"
@@ -21,13 +22,12 @@
         {{ item.body }}
       </Tweet>
     </div>
-    Content
     <button @click="handleModalShow" class="btn btnTweet btnTweetHome">
       New Tweet
     </button>
-    <Modal v-if="showModal" @onClose="handleModalShow" title="New Tweet"
-      >todo: logic for form</Modal
-    >
+    <Modal v-if="showModal" @onClose="handleModalShow" title="New Tweet">
+      <TweetForm @onSubmit="handleTweetSubmit"></TweetForm>
+    </Modal>
   </div>
 </template>
 
@@ -35,12 +35,13 @@
 import { ref, computed } from 'vue'
 import Spinner from '@/components/UI/Spinner.vue'
 import Tweet from '@/components/UI/Tweet.vue'
+import TweetForm from '@/components/UI/TweetForm.vue'
 import Modal from '@/components/UI/Modal.vue'
 
 export default {
-  components: { Tweet, Spinner, Modal },
+  components: { Tweet, TweetForm, Spinner, Modal },
   setup() {
-    const data = [
+    const data = ref([
       {
         id: 1,
         body: 'Hello world!',
@@ -65,15 +66,31 @@ export default {
         likes: 15,
         date: '08-04-2021'
       }
-    ]
+    ])
 
     const sortBy = ref('date')
     const dataSorted = computed(() => {
-      return data.sort((a, b) => {
+      return data.value.sort((a, b) => {
         if (a[sortBy.value] < b[sortBy.value]) return 1
         if (a[sortBy.value] > b[sortBy.value]) return -1
       })
     })
+
+    const handleLikeSubmit = id => {
+      console.log(`tweet id ${id} has been liked`)
+    }
+
+    const handleTweetSubmit = body => {
+      data.value.push({
+        id: data.value.length + 1,
+        body,
+        avatar:
+          'https://tocode.ru/static/_secret/bonuses/1/avatar-1Tq9kaAql.png',
+        likes: 0,
+        date: new Date(Date.now()).toLocaleString()
+      })
+      handleModalShow()
+    }
 
     const isLoading = ref(false)
     // setTimeout(() => {
@@ -86,7 +103,16 @@ export default {
       showModal.value = nextShowModal
     }
 
-    return { data, sortBy, dataSorted, isLoading, showModal, handleModalShow }
+    return {
+      data,
+      sortBy,
+      dataSorted,
+      handleLikeSubmit,
+      handleTweetSubmit,
+      isLoading,
+      showModal,
+      handleModalShow
+    }
   }
 }
 </script>
