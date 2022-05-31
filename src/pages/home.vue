@@ -32,7 +32,7 @@
 </template>
 
 <script>
-import { ref, reactive, computed } from 'vue'
+import { onMounted, ref, reactive, computed } from 'vue'
 import http from '@/http-common'
 import Spinner from '@/components/UI/Spinner.vue'
 import Tweet from '@/components/UI/Tweet.vue'
@@ -42,32 +42,30 @@ import Modal from '@/components/UI/Modal.vue'
 export default {
   components: { Tweet, TweetForm, Spinner, Modal },
   setup() {
-    const data = ref([
-      {
-        id: 1,
-        body: 'Hello world!',
-        avatar:
-          'https://tocode.ru/static/_secret/bonuses/1/avatar-1Tq9kaAql.png',
-        likes: 34,
-        date: '10-04-2021'
-      },
-      {
-        id: 2,
-        body: 'Hello world 2!',
-        avatar:
-          'https://tocode.ru/static/_secret/bonuses/1/avatar-1Tq9kaAql.png',
-        likes: 0,
-        date: '15-04-2021'
-      },
-      {
-        id: 3,
-        body: 'Hello world 3!',
-        avatar:
-          'https://tocode.ru/static/_secret/bonuses/1/avatar-1Tq9kaAql.png',
-        likes: 15,
-        date: '08-04-2021'
-      }
-    ])
+    const isLoading = ref(true)
+    // setTimeout(() => {
+    //   isLoading.value = false
+    // }, 2000)
+
+    const data = ref([])
+
+    onMounted(() => getTweets())
+
+    const getTweets = () => {
+      http
+        .get('/tweets.json')
+        .then(res => {
+          const nextData = []
+          Object.keys(res.data).forEach(key => {
+            const item = res.data[key]
+            nextData.push({ id: key, ...item })
+          })
+
+          data.value = nextData
+          isLoading.value = false
+        })
+        .catch(e => console.log(e))
+    }
 
     const sortBy = ref('date')
     const dataSorted = computed(() => {
@@ -82,31 +80,21 @@ export default {
     }
 
     const handleTweetSubmit = body => {
-      // data.value.push({
-      //   id: data.value.length + 1,
-      //   body,
-      //   avatar:
-      //     'https://tocode.ru/static/_secret/bonuses/1/avatar-1Tq9kaAql.png',
-      //   likes: 0,
-      //   date: new Date(Date.now()).toLocaleString()
-      // })
-
       const tweet = reactive({
-        id: data.value.length + 1,
         body,
-        avatar:
-          'https://tocode.ru/static/_secret/bonuses/1/avatar-1Tq9kaAql.png',
+        avatar: `https://avatars.dicebear.com/api/adventurer/human/${Date.now()}.svg`,
         likes: 0,
         date: new Date(Date.now()).toLocaleString()
       })
-      http.post('/tweets.json', tweet)
-      handleModalShow()
-    }
 
-    const isLoading = ref(false)
-    // setTimeout(() => {
-    //   isLoading.value = false
-    // }, 2000)
+      http
+        .post('/tweets.json', tweet)
+        .then(() => {
+          getTweets()
+          handleModalShow()
+        })
+        .catch(e => console.log(e))
+    }
 
     const showModal = ref(false)
     const handleModalShow = () => {
