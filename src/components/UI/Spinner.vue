@@ -1,7 +1,11 @@
 <template>
   <div class="spinner-wrapper">
     <div
-      :style="{ width: `${width}px`, height: `${width}px` }"
+      :style="{
+        width: `${width}px`,
+        height: `${width}px`,
+        'margin-top': `${marginTop}vh`
+      }"
       class="spinner"
     />
   </div>
@@ -17,6 +21,10 @@ export default {
     height: {
       type: Number,
       default: 80
+    },
+    marginTop: {
+      type: Number,
+      default: 0
     }
   },
   setup() {}

@@ -1,6 +1,6 @@
 <template>
   <div v-if="isLoading">
-    <Spinner />
+    <Spinner :marginTop="20" />
   </div>
   <div v-else>
     <div class="tweet-menu-wrapper">
@@ -13,13 +13,13 @@
     </div>
     <div class="tweets" v-for="item in dataSorted" :key="item.id">
       <Tweet
-        @onSubmit="handleLikeSubmit"
+        @onSubmit="handleLikeSubmit(item)"
         :id="item.id"
         :likes="item.likes"
         :name="item.date"
         :imgUrl="item.avatar"
       >
-        {{ item.body }}
+        <div class="md-body" v-html="compiledMarked(item.body)"></div>
       </Tweet>
     </div>
     <button @click="handleModalShow" class="btn btnTweet btnTweetHome">
@@ -32,6 +32,8 @@
 </template>
 
 <script>
+import { marked } from 'marked'
+
 import { onMounted, ref, reactive, computed } from 'vue'
 import http from '@/http-common'
 import Spinner from '@/components/UI/Spinner.vue'
@@ -43,11 +45,11 @@ export default {
   components: { Tweet, TweetForm, Spinner, Modal },
   setup() {
     const isLoading = ref(true)
-    // setTimeout(() => {
-    //   isLoading.value = false
-    // }, 2000)
-
     const data = ref([])
+
+    const compiledMarked = text => {
+      return marked(text, {})
+    }
 
     onMounted(() => getTweets())
 
@@ -75,8 +77,12 @@ export default {
       })
     })
 
-    const handleLikeSubmit = id => {
-      console.log(`tweet id ${id} has been liked`)
+    const handleLikeSubmit = tweet => {
+      tweet.likes += 1
+      http
+        .put(`/tweets/${tweet.id}.json`, tweet)
+        .then(() => {})
+        .catch(e => console.log(e))
     }
 
     const handleTweetSubmit = body => {
@@ -108,6 +114,7 @@ export default {
       dataSorted,
       handleLikeSubmit,
       handleTweetSubmit,
+      compiledMarked,
       isLoading,
       showModal,
       handleModalShow

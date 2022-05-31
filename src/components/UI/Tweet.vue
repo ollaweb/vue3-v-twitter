@@ -49,8 +49,8 @@ export default {
     }
   },
   emits: ['onSubmit'],
-  setup({ id }, { emit }) {
-    const handleLikeClick = () => emit('onSubmit', id)
+  setup(_, { emit }) {
+    const handleLikeClick = () => emit('onSubmit')
     return { handleLikeClick }
   }
 }
